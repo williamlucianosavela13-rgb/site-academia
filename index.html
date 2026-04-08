@@ -1,0 +1,632 @@
+import { useState, useEffect } from "react";
+import { Dumbbell, Music, Bike, Shield, Layers, Package, Activity, Users, Smartphone, Award, MapPin, Clock, Instagram, MessageCircle, ChevronDown } from "lucide-react";
+
+const WA_LINK = "https://wa.me/5555999999999";
+
+const MODALIDADES = [
+  {
+    icon: Dumbbell,
+    name: "Musculação",
+    desc: "Equipamentos modernos para hipertrofia e condicionamento com acompanhamento especializado.",
+    img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80",
+  },
+  {
+    icon: Music,
+    name: "Dança",
+    desc: "Aulas dinâmicas que unem movimento, ritmo e bem-estar para todos os níveis.",
+    img: "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=600&q=80",
+  },
+  {
+    icon: Bike,
+    name: "Spinning",
+    desc: "Pedala com energia! Aulas intensas de ciclismo indoor para queimar calorias.",
+    img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
+  },
+  {
+    icon: Shield,
+    name: "Jiu-Jitsu",
+    desc: "Arte marcial com o instrutor Renilson de Souza. Segunda, Quarta e Sábado.",
+    img: "https://images.unsplash.com/photo-1555597673-b21d5c935865?w=600&q=80",
+  },
+];
+
+const DIFERENCIAIS = [
+  { icon: Layers, name: "Estrutura de verdade", desc: "Academia equipada com aparelhos profissionais de última geração." },
+  { icon: Package, name: "Suplementação de qualidade", desc: "Loja própria com Whey, Creatina, Tiaraju e os melhores suplementos." },
+  { icon: Activity, name: "Treinamento funcional", desc: "Melhore força, coordenação e prevenção de lesões com treinos adaptáveis." },
+  { icon: Users, name: "Equipe especializada", desc: "Profissionais dedicados ao seu resultado com acompanhamento personalizado." },
+  { icon: Smartphone, name: "Controle corporal", desc: "Tecnologia de bioimpedância para monitoramento do seu progresso." },
+  { icon: Award, name: "35 anos de tradição", desc: "Décadas de experiência formando atletas e transformando vidas em Santo Ângelo." },
+];
+
+const HORARIOS = [
+  { dia: "Segunda à Sexta", horario: "06h às 00h" },
+  { dia: "Sábado", horario: "09h às 11h  |  15h às 18h" },
+  { dia: "Domingo", horario: "15h às 17h" },
+];
+
+/* ─── Logo Component ─────────────────────────────────────────── */
+function Logo({ size = "default" }) {
+  const logoSrc = null; // substitua por: import logoImg from './logo.png'; e use logoSrc = logoImg
+  if (logoSrc) {
+    return <img src={logoSrc} alt="Academia Destak" style={{ height: size === "large" ? 56 : 36 }} />;
+  }
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{
+        width: size === "large" ? 48 : 34,
+        height: size === "large" ? 48 : 34,
+        background: "#f5c518",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <Dumbbell size={size === "large" ? 26 : 18} color="#0a0f1e" strokeWidth={2.5} />
+      </div>
+      <span style={{
+        fontFamily: "'Oswald', 'Bebas Neue', sans-serif",
+        fontSize: size === "large" ? 36 : 22,
+        fontWeight: 800,
+        letterSpacing: 3,
+        color: "#f5c518",
+        lineHeight: 1,
+      }}>DESTAK</span>
+    </div>
+  );
+}
+
+/* ─── Styles ─────────────────────────────────────────────────── */
+const css = `
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #07101f;
+    --navy2: #0d1628;
+    --navy3: #111d36;
+    --card: #141f38;
+    --border: #1e2d4a;
+    --yellow: #f5c518;
+    --yellow2: #e6b800;
+    --white: #ffffff;
+    --gray: #8fa3be;
+    --gray2: #5a7394;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(7,16,31,0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { color: var(--gray); font-size: 14px; text-decoration: none; font-weight: 500; transition: color .15s; }
+  .nav-links a:hover { color: var(--yellow); }
+  @media (max-width: 640px) { .nav-links { display: none; } }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 24px 72px;
+    position: relative; overflow: hidden;
+    background: var(--navy);
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1400&q=60');
+    background-size: cover; background-position: center;
+    opacity: 0.12; z-index: 0;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 90% 60% at 50% 40%, rgba(245,197,24,0.07) 0%, transparent 70%);
+    z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(245,197,24,0.1); border: 1px solid rgba(245,197,24,0.28);
+    color: var(--yellow); font-size: 12px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 24px;
+    letter-spacing: .8px; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(36px, 9vw, 72px);
+    font-weight: 800; line-height: 1.05; margin-bottom: 20px;
+    letter-spacing: -1px; text-transform: uppercase;
+  }
+  .hero h1 span { color: var(--yellow); }
+  .hero p { font-size: clamp(15px, 2.5vw, 18px); color: var(--gray); max-width: 520px; margin: 0 auto 40px; line-height: 1.75; }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .hero-stats {
+    display: flex; flex-wrap: wrap; gap: 40px; justify-content: center;
+    margin-top: 64px; padding-top: 40px;
+    border-top: 1px solid var(--border);
+    width: 100%; max-width: 560px; position: relative; z-index: 2;
+  }
+  .stat-num { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 800; color: var(--yellow); line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--gray2); margin-top: 4px; letter-spacing: .8px; text-transform: uppercase; }
+
+  /* BUTTONS */
+  .btn-primary {
+    display: inline-block;
+    background: var(--yellow); color: var(--navy);
+    font-weight: 800; font-size: 15px; padding: 14px 32px;
+    border: none; border-radius: 8px; cursor: pointer;
+    text-decoration: none; letter-spacing: .4px;
+    transition: background .15s, transform .15s;
+  }
+  .btn-primary:hover { background: var(--yellow2); transform: scale(1.03); }
+  .btn-outline {
+    display: inline-block;
+    background: transparent; color: var(--white);
+    font-weight: 600; font-size: 15px; padding: 14px 28px;
+    border: 1.5px solid rgba(255,255,255,0.22); border-radius: 8px;
+    cursor: pointer; text-decoration: none;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* SECTIONS */
+  section { padding: 80px 24px; }
+  .container { max-width: 920px; margin: 0 auto; }
+  .section-tag {
+    display: inline-block; background: rgba(245,197,24,0.1);
+    color: var(--yellow); font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 4px; letter-spacing: 1.2px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700; margin-bottom: 14px; line-height: 1.15; text-transform: uppercase;
+  }
+  .section-sub { color: var(--gray); font-size: 16px; line-height: 1.75; max-width: 600px; }
+  .divider { width: 48px; height: 3px; background: var(--yellow); margin: 16px 0 24px; border-radius: 2px; }
+
+  /* SOBRE */
+  .sobre { background: var(--navy2); }
+  .sobre-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  @media (max-width: 700px) { .sobre-inner { grid-template-columns: 1fr; } }
+  .sobre-img-wrap {
+    border-radius: 14px; overflow: hidden;
+    height: 340px; position: relative;
+    border: 1px solid var(--border);
+  }
+  .sobre-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .85; }
+  .sobre-img-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(7,16,31,.92) 0%, transparent 60%);
+    padding: 20px;
+  }
+  .sobre-img-label { font-family: 'Oswald', sans-serif; font-size: 28px; color: var(--yellow); font-weight: 800; }
+  .sobre-text p { color: var(--gray); font-size: 15px; line-height: 1.85; margin-bottom: 16px; }
+
+  /* MODALIDADES */
+  .mod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 44px; }
+  .mod-card {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--border); position: relative;
+    transition: transform .25s, border-color .25s;
+    cursor: default;
+  }
+  .mod-card:hover { transform: translateY(-6px); border-color: var(--yellow); }
+  .mod-img { width: 100%; height: 180px; object-fit: cover; display: block; opacity: .7; transition: opacity .25s; }
+  .mod-card:hover .mod-img { opacity: .9; }
+  .mod-body { background: var(--card); padding: 20px 18px; }
+  .mod-icon-wrap {
+    width: 40px; height: 40px; background: rgba(245,197,24,0.12);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+  .mod-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .mod-card p { font-size: 13px; color: var(--gray); line-height: 1.65; }
+
+  /* HORÁRIOS */
+  .horarios { background: var(--navy2); }
+  .hours-table { width: 100%; border-collapse: collapse; margin-top: 40px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .hours-table thead { background: var(--yellow); }
+  .hours-table thead th { color: var(--navy); font-weight: 800; font-size: 13px; padding: 14px 22px; text-align: left; letter-spacing: .6px; text-transform: uppercase; }
+  .hours-table tbody tr { border-bottom: 1px solid var(--border); background: var(--card); transition: background .15s; }
+  .hours-table tbody tr:hover { background: #192038; }
+  .hours-table tbody td { padding: 16px 22px; font-size: 15px; }
+  .hours-table tbody td:first-child { color: var(--gray); font-weight: 600; }
+  .hours-table tbody td:last-child { color: var(--yellow); font-weight: 700; font-family: 'Oswald', sans-serif; font-size: 16px; }
+
+  /* DIFERENCIAIS */
+  .dif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 44px; }
+  .dif-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+    transition: border-color .2s, transform .2s;
+  }
+  .dif-card:hover { border-color: rgba(245,197,24,0.35); transform: translateY(-3px); }
+  .dif-icon {
+    width: 44px; height: 44px; background: rgba(245,197,24,0.1);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .dif-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .dif-card p { font-size: 13px; color: var(--gray); line-height: 1.65; }
+
+  /* LOCALIZAÇÃO */
+  .loc { background: var(--navy2); }
+  .loc-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 44px; }
+  @media (max-width: 700px) { .loc-inner { grid-template-columns: 1fr; } }
+  .loc-detail { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .loc-detail-icon { width: 36px; height: 36px; background: rgba(245,197,24,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .loc-detail-text span { font-size: 12px; color: var(--gray2); text-transform: uppercase; letter-spacing: .6px; }
+  .loc-detail-text strong { display: block; font-size: 15px; color: var(--white); font-weight: 600; margin-top: 2px; }
+  .map-img-wrap { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); height: 260px; position: relative; }
+  .map-img-wrap img { width: 100%; height: 100%; object-fit: cover; opacity: .75; display: block; }
+  .map-pin-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; background: rgba(7,16,31,0.55);
+  }
+  .map-pin-overlay a {
+    background: var(--yellow); color: var(--navy); font-weight: 800; font-size: 14px;
+    padding: 10px 22px; border-radius: 8px; text-decoration: none; transition: background .15s;
+  }
+  .map-pin-overlay a:hover { background: var(--yellow2); }
+
+  /* CTA FINAL */
+  .cta-final {
+    background: var(--yellow); text-align: center; padding: 80px 24px;
+    position: relative; overflow: hidden;
+  }
+  .cta-final::before {
+    content: '35';
+    position: absolute; right: -20px; top: -30px;
+    font-family: 'Oswald', sans-serif; font-size: 240px; font-weight: 800;
+    color: rgba(10,15,30,0.08); line-height: 1; pointer-events: none; user-select: none;
+  }
+  .cta-final h2 { font-family: 'Oswald', sans-serif; font-size: clamp(28px, 6vw, 48px); font-weight: 800; color: var(--navy); margin-bottom: 14px; text-transform: uppercase; }
+  .cta-final p { color: rgba(7,16,31,0.6); font-size: 17px; margin-bottom: 40px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+  .btn-dark {
+    display: inline-block;
+    background: var(--navy); color: var(--yellow);
+    font-weight: 800; font-size: 16px; padding: 16px 36px;
+    border: none; border-radius: 8px; cursor: pointer; text-decoration: none;
+    transition: background .15s; letter-spacing: .4px;
+  }
+  .btn-dark:hover { background: #0d1628; }
+
+  /* FOOTER */
+  footer { background: #040b14; padding: 40px 24px; text-align: center; border-top: 1px solid var(--border); }
+  footer p { color: var(--gray2); font-size: 13px; margin-bottom: 6px; }
+  footer strong { color: var(--yellow); }
+
+  /* WPP FLOAT — position: fixed para acompanhar a rolagem */
+  .wpp-float {
+    position: fixed;
+    bottom: 24px; right: 24px; z-index: 9999;
+    width: 60px; height: 60px;
+    background: #25d366; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .wpp-float:hover { transform: scale(1.12); box-shadow: 0 6px 28px rgba(37,211,102,.55); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--navy); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+`;
+
+/* ─── Main Component ─────────────────────────────────────────── */
+export default function DestakLanding() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <>
+      <style>{css}</style>
+
+      {/* NAV */}
+      <nav className="nav" style={{ boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,.4)" : "none" }}>
+        <Logo />
+        <ul className="nav-links">
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#modalidades">Modalidades</a></li>
+          <li><a href="#horarios">Horários</a></li>
+          <li><a href="#localizacao">Localização</a></li>
+        </ul>
+        <a className="btn-primary" href={WA_LINK} target="_blank" rel="noreferrer" style={{ fontSize: 13, padding: "9px 20px" }}>
+          Matricule-se
+        </a>
+      </nav>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-bg" />
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <div className="hero-badge">
+            <Award size={13} />
+            <span>35 anos de história em Santo Ângelo</span>
+          </div>
+          <h1>
+            Disciplina no treino,<br />
+            <span>resultados na vida!</span>
+          </h1>
+          <p>
+            A academia mais tradicional de Santo Ângelo. Estrutura completa,
+            equipe especializada e foco total no seu resultado.
+          </p>
+          <div className="hero-btns">
+            <a className="btn-primary" href={WA_LINK} target="_blank" rel="noreferrer">
+              Matricule-se Agora
+            </a>
+            <a className="btn-outline" href="#modalidades">
+              Conhecer Modalidades
+            </a>
+          </div>
+        </div>
+        <div className="hero-stats">
+          {[
+            { num: "35+", lbl: "anos de tradição" },
+            { num: "4.9k", lbl: "seguidores" },
+            { num: "100%", lbl: "foco em resultado" },
+          ].map((s) => (
+            <div key={s.lbl} style={{ textAlign: "center" }}>
+              <div className="stat-num">{s.num}</div>
+              <div className="stat-lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SOBRE */}
+      <section className="sobre" id="sobre">
+        <div className="container">
+          <div className="sobre-inner">
+            <div className="sobre-img-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=75"
+                alt="Interior Academia Destak"
+              />
+              <div className="sobre-img-overlay">
+                <div className="sobre-img-label">Desde 1990</div>
+              </div>
+            </div>
+            <div className="sobre-text">
+              <span className="section-tag">Sobre nós</span>
+              <h2 className="section-title">Tradição e excelência em Santo Ângelo</h2>
+              <div className="divider" />
+              <p>
+                Há 35 anos a Academia Destak é referência em saúde, bem-estar e
+                resultados na região. Localizada na Avenida Venâncio Aires, nossa
+                estrutura foi construída para te desafiar e transformar.
+              </p>
+              <p>
+                Nossa equipe de instrutores especializados e equipamentos de alto
+                padrão garantem que cada treino seja eficiente, seguro e focado
+                nos seus objetivos.
+              </p>
+              <a className="btn-primary" href={WA_LINK} target="_blank" rel="noreferrer" style={{ fontSize: 14, padding: "12px 26px" }}>
+                Comece sua jornada
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MODALIDADES */}
+      <section id="modalidades" style={{ background: "var(--navy)" }}>
+        <div className="container">
+          <span className="section-tag">Modalidades</span>
+          <h2 className="section-title">O que oferecemos</h2>
+          <p className="section-sub">
+            Diversidade de treinos para todos os objetivos e níveis de condicionamento físico.
+          </p>
+          <div className="mod-grid">
+            {MODALIDADES.map((m) => {
+              const Icon = m.icon;
+              return (
+                <div className="mod-card" key={m.name}>
+                  <img className="mod-img" src={m.img} alt={m.name} />
+                  <div className="mod-body">
+                    <div className="mod-icon-wrap">
+                      <Icon size={20} color="var(--yellow)" strokeWidth={2} />
+                    </div>
+                    <h3>{m.name}</h3>
+                    <p>{m.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* HORÁRIOS */}
+      <section className="horarios" id="horarios">
+        <div className="container">
+          <span className="section-tag">Funcionamento</span>
+          <h2 className="section-title">Horários de atendimento</h2>
+          <p className="section-sub">
+            Horários fixos para você planejar seus treinos com tranquilidade.
+          </p>
+          <table className="hours-table">
+            <thead>
+              <tr>
+                <th>Dia</th>
+                <th>Horário</th>
+              </tr>
+            </thead>
+            <tbody>
+              {HORARIOS.map((h) => (
+                <tr key={h.dia}>
+                  <td>{h.dia}</td>
+                  <td>{h.horario}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* DIFERENCIAIS */}
+      <section style={{ background: "var(--navy)" }}>
+        <div className="container">
+          <span className="section-tag">Por que a Destak?</span>
+          <h2 className="section-title">Nossos diferenciais</h2>
+          <p className="section-sub">
+            Tudo o que você precisa para alcançar resultados reais em um só lugar.
+          </p>
+          <div className="dif-grid">
+            {DIFERENCIAIS.map((d) => {
+              const Icon = d.icon;
+              return (
+                <div className="dif-card" key={d.name}>
+                  <div className="dif-icon">
+                    <Icon size={20} color="var(--yellow)" strokeWidth={2} />
+                  </div>
+                  <div>
+                    <h3>{d.name}</h3>
+                    <p>{d.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* LOCALIZAÇÃO */}
+      <section className="loc" id="localizacao">
+        <div className="container">
+          <span className="section-tag">Localização</span>
+          <h2 className="section-title">Onde nos encontrar</h2>
+          <div className="loc-inner">
+            <div>
+              {[
+                { icon: MapPin, label: "Endereço", value: "Av. Venâncio Aires, 1989\nSanto Ângelo – RS" },
+                { icon: Clock, label: "Segunda a Sexta", value: "06h às 00h" },
+                { icon: Clock, label: "Sábado", value: "09h às 11h | 15h às 18h" },
+                { icon: Instagram, label: "Instagram", value: "@destak_academia_" },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div className="loc-detail" key={item.label}>
+                    <div className="loc-detail-icon">
+                      <Icon size={18} color="var(--yellow)" strokeWidth={2} />
+                    </div>
+                    <div className="loc-detail-text">
+                      <span>{item.label}</span>
+                      <strong style={{ whiteSpace: "pre-line" }}>{item.value}</strong>
+                    </div>
+                  </div>
+                );
+              })}
+              <a
+                className="btn-primary"
+                href="https://maps.google.com?q=Av.+Venâncio+Aires,+1989,+Santo+Ângelo"
+                target="_blank"
+                rel="noreferrer"
+                style={{ marginTop: 8, fontSize: 14, padding: "12px 26px" }}
+              >
+                Abrir no Google Maps
+              </a>
+            </div>
+            <div className="map-img-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=700&q=70"
+                alt="Localização academia"
+              />
+              <div className="map-pin-overlay">
+                <MapPin size={32} color="var(--yellow)" />
+                <a
+                  href="https://maps.google.com?q=Av.+Venâncio+Aires,+1989,+Santo+Ângelo"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Ver no Maps
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="cta-final">
+        <h2>Pronto para começar?</h2>
+        <p>
+          Não é sobre sorte ou genética. É sobre disciplina e constância.
+          Venha treinar na Destak!
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
+          <a className="btn-dark" href={WA_LINK} target="_blank" rel="noreferrer">
+            Falar no WhatsApp
+          </a>
+          <a
+            href="https://instagram.com/destak_academia_"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "inline-block",
+              background: "transparent",
+              color: "var(--navy)",
+              fontWeight: 700,
+              fontSize: 15,
+              padding: "14px 28px",
+              border: "2px solid var(--navy)",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}
+          >
+            Ver Instagram
+          </a>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer>
+        <div style={{ marginBottom: 12 }}>
+          <Logo />
+        </div>
+        <p><strong>Academia Destak</strong></p>
+        <p>Av. Venâncio Aires, 1989 — Santo Ângelo, RS</p>
+        <p style={{ marginTop: 14, fontSize: 12, color: "var(--gray2)" }}>
+          © {new Date().getFullYear()} Academia Destak. Todos os direitos reservados.
+        </p>
+      </footer>
+
+      {/* BOTÃO FLUTUANTE WHATSAPP — position: fixed */}
+      <a
+        className="wpp-float"
+        href={WA_LINK}
+        target="_blank"
+        rel="noreferrer"
+        title="Falar no WhatsApp"
+        aria-label="WhatsApp"
+      >
+        <MessageCircle size={28} color="white" strokeWidth={1.5} fill="none" />
+      </a>
+    </>
+  );
+}
